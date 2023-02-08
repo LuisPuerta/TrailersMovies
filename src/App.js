@@ -13,13 +13,18 @@ function App() {
 
   //State variables
   const [movies, setMovies] = useState([]); //Movies array
-  const [searchKey, setSearchKey] = useState(""); //Searched movie in input text
-  const [trailer, setTrailer] = useState(null); //Trailer got from movie selected
   const [movie, setMovie] = useState({ title: "Loading movies" }); //Movie selected
+  const [searchKey, setSearchKey] = useState(""); //Searched movie in input text
+  const [searchedKey, setSearchedKey] = useState("");
+  const [trailer, setTrailer] = useState(null); //Trailer got from movie selected
   const [playing, setPlaying] = useState(false); //Aux to check if trailer is playing
 
+  // Aux variables for the next/prev buttons
+  const [index, setIndex] = useState(0);
+  let auxIndex = 0;
+
   //API GET Request list of movies
-  async function fetchMovies(searchKey) {
+  async function fetchMovies(searchKey, index) {
     const type = searchKey ? "search" : "discover"; //Type of "search" is being done
 
     const {
@@ -30,14 +35,14 @@ function App() {
         query: searchKey,
       },
     });
-
     // console.log(results);
+
     setMovies(results); // Save array of movies
     setMovie(results[0]); // Save only 1 movie
 
     // Sending the first movie result to FetchMovie
     if (results.length) {
-      await fetchMovie(results[0].id);
+      await fetchMovie(results[index ? index : 0].id);
     }
   }
 
@@ -78,12 +83,24 @@ function App() {
     fetchMovie(movie.id);
     setMovie(movie);
     window.scrollTo(0, 0);
+
+    movieIndex(movie.id, searchKey);
+    setIndex(movieIndex(movie.id, searchKey));
   }
 
   //Search specific movies
   function searchMovies(e) {
     e.preventDefault();
-    fetchMovies(searchKey);
+
+    //Resetting the aux variables of next/prev buttons to 0;
+    setIndex(0);
+    auxIndex = 0;
+
+    //Setting the new searched key
+    setSearchedKey(searchKey);
+
+    //Fetching new results
+    fetchMovies(searchKey, 0);
   }
 
   //Handler function to change the new key to be searched
@@ -96,11 +113,112 @@ function App() {
     setPlaying(playORpause);
   }
 
+  //Get index of the actual movie
+  async function movieIndex(id, searchKey) {
+    const type = searchKey ? "search" : "discover"; //Type of "search" is being done
+
+    const {
+      data: { results },
+    } = await axios.get(`${API_URL}/${type}/movie`, {
+      params: {
+        api_key: API_KEY,
+        query: searchKey,
+      },
+    });
+
+    const movieInd = results.findIndex((movie) => movie.id === id);
+    // console.log(movieInd);
+
+    setIndex(movieInd);
+  }
+
+  //Change to the NEXT movie
+  async function handleNextMovie() {
+    if (movies.length === 20 && index === 19) {
+      alert("Sorry it's over");
+    } else {
+      auxIndex = auxIndex + 1;
+      setIndex(index + 1);
+
+      // console.log(index);
+
+      const type = searchKey ? "search" : "discover"; //Type of "search" is being done
+      const {
+        data: { results },
+      } = await axios.get(`${API_URL}/${type}/movie`, {
+        params: {
+          api_key: API_KEY,
+          query: searchKey,
+        },
+      });
+
+      // Sending the result to FetchMovie
+      if (results.length) {
+        try {
+          await fetchMovie(results[index === 0 ? auxIndex : index + 1].id);
+        } catch (e) {
+          auxIndex = movies.length - 1;
+          setIndex(movies.length - 1);
+
+          alert("You reached the end!");
+          console.log(e);
+        }
+      }
+    }
+  }
+
+  //Change to the PREV movie
+  async function handlePrevMovie() {
+    if (movies.length === 0 && index === 0) {
+      alert("You are at the beginning!");
+    } else {
+      auxIndex = auxIndex - 1;
+      setIndex(index - 1);
+
+      // console.log(index);
+
+      const type = searchKey ? "search" : "discover"; //Type of "search" is being done
+      const {
+        data: { results },
+      } = await axios.get(`${API_URL}/${type}/movie`, {
+        params: {
+          api_key: API_KEY,
+          query: searchKey,
+        },
+      });
+
+      // Sending the result to FetchMovie
+      if (results.length) {
+        try {
+          await fetchMovie(results[index === 0 ? auxIndex : index - 1].id);
+        } catch (e) {
+          auxIndex = 0;
+          setIndex(0);
+
+          alert("You are at the beginning!");
+          console.log(e);
+        }
+      }
+    }
+  }
+
+  // Cleaning searchs
+  function cleanSearch() {
+    document.getElementById("searcherInput").value = "";
+    setSearchKey("");
+    setSearchedKey("");
+
+    fetchMovies("", 0);
+  }
+
   return (
-    <div className="mainContainer mt-2">
-      <div className="row header">
+    <>
+      <div className="header row">
         <div className="col">
-          <h2 className="text-left text-warning mt mb-2">
+          <h2
+            className="text-left text-warning mt-1 mb-2"
+            onClick={cleanSearch}
+          >
             Search movie trailers!
           </h2>
         </div>
@@ -114,27 +232,30 @@ function App() {
         />
       </div>
 
-      {/*Videoplayer component */}
-      <Videoplayer
-        movie={movie}
-        IMAGE_PATH={IMAGE_PATH}
-        trailer={trailer}
-        playing={playing}
-        OnclickPlaying={handleOnClickPlaying}
-      />
+      <div className="mainContainer mt-2">
+        {/*Videoplayer component */}
+        <Videoplayer
+          movie={movie}
+          IMAGE_PATH={IMAGE_PATH}
+          trailer={trailer}
+          playing={playing}
+          OnclickPlaying={handleOnClickPlaying}
+          nextMovie={handleNextMovie}
+          prevMovie={handlePrevMovie}
+        />
 
-      {/*Movies component */}
-      <Movies
-        moviesList={movies}
-        selectMovie={selectMovie}
-        URL_IMAGE={URL_IMAGE}
-      />
+        {/*Movies component */}
+        <Movies
+          moviesList={movies}
+          selectMovie={selectMovie}
+          URL_IMAGE={URL_IMAGE}
+          searchedKey={searchedKey}
+        />
 
-      {/* Here's how the code would be without components */}
-
-      {/* Movie searcher */}
-      <div>
-        {/* <form className="container mb-2 d-flex " onSubmit={searchMovies}>
+        {/* Here's how the code would be without components */}
+        {/* Movie searcher */}
+        <div>
+          {/* <form className="container mb-2 d-flex " onSubmit={searchMovies}>
           <div className="ms-auto">
             <input
               type="text"
@@ -146,11 +267,10 @@ function App() {
             </button>
           </div>
         </form> */}
-      </div>
-
-      {/* Banner and videoplayer container */}
-      <div>
-        {/* <main>
+        </div>
+        {/* Banner and videoplayer container */}
+        <div>
+          {/* <main>
           {movie ? (
             <div
               className="viewTrailer"
@@ -208,11 +328,10 @@ function App() {
             </div>
           ) : null}
         </main> */}
-      </div>
-
-      {/* Container showing movies posters */}
-      <div>
-        {/* <div className="container mt-3">
+        </div>
+        {/* Container showing movies posters */}
+        <div>
+          {/* <div className="container mt-3">
         <div className="row">
           {movies.map((m) => (
             <div
@@ -232,15 +351,17 @@ function App() {
           ))}
         </div>
       </div> */}
-      </div>
+        </div>
 
-      <footer className="text-white text-center my-5">
-        <p>
-          <span className="mdi mdi-copyright"></span>2023, no copyright intended
-        </p>
-        <p>All the data was collected from the TMDB API</p>
-      </footer>
-    </div>
+        <footer className="text-white text-center my-5">
+          <p>
+            <span className="mdi mdi-copyright"></span>
+            2023, no copyright intended
+          </p>
+          <p>All the data was collected from the TMDB API</p>
+        </footer>
+      </div>
+    </>
   );
 }
 

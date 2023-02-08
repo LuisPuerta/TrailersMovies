@@ -1,20 +1,35 @@
-*{
+* {
   margin: 0;
   box-sizing: border-box;
 }
 
-html{
+html {
   scroll-behavior: smooth;
 }
 
-body{
+body {
   background-color: #202020;
 }
 
 /* Container of the whole app */
-.mainContainer{
+.mainContainer {
   width: 95%;
   margin: auto;
+  padding-top: 50px;
+}
+
+/* App header */
+.header {
+  background: #252525;
+  position: fixed;
+  width: 100%;
+  margin: -10px 0px 0px;
+  padding: 10px 5px 0px;
+}
+
+.header h2 {
+  width: fit-content;
+  cursor: pointer;
 }
 
 /* Banner (trailer and movie description) */
@@ -27,37 +42,40 @@ body{
   align-items: flex-end;
 }
 
-.trailerOverlay{
+.trailerOverlay {
   background: rgb(25 25 25 / 70%);
   height: 100%;
 }
 
-.movieDescription{
-  backdrop-filter: blur(5px);
+.movieDescription {
+  /* backdrop-filter: blur(5px); */
+
+  background: rgba(25, 25, 25, 0.4);
+  border-radius: 5px;
 }
 
-.noTrailerWarning{
+.noTrailerWarning {
   width: fit-content;
 }
 
-.stopButtonnDiv{
+.stopButtonnDiv {
   padding: 5px;
 }
 
-.stopButton{
+.stopButton {
   background-color: transparent;
   color: white;
   outline: none;
-  border: transparent ;
+  border: transparent;
   padding: 10px 15px;
   cursor: pointer;
-  margin:auto;
+  margin: auto;
   font-size: x-large;
 
-  transition: .3s all;
+  transition: 0.3s all;
 }
 
-.stopButton:hover{
+.stopButton:hover {
   transform: scale(110%);
 }
 
@@ -70,10 +88,10 @@ body{
   cursor: pointer;
   margin-bottom: 10px;
 
-  transition: .3s all;
+  transition: 0.3s all;
 }
 
-.boton:hover{
+.boton:hover {
   transform: scale(110%);
 }
 
@@ -83,38 +101,62 @@ body{
   padding: 5px;
 }
 
-/* List of movies */
-.moviePoster{
-  cursor: pointer;
-  transition: .5s all;
+.changingButton {
+  background: rgba(25, 25, 25, 0.3);
+  width: fit-content;
+  border: none;
+  border-radius: 20px;
+  transition: 0.1s all;
+  margin-right: 5px;
+  margin-left: 5px;
+
+  font-size: xx-large;
+
+  color: #d1d1d1;
 }
 
-.moviePoster:hover{
+.changingButton:hover {
+  transform: scale(1.1);
+}
+
+/* List of movies */
+.moviePoster {
+  cursor: pointer;
+  transition: 0.5s all;
+}
+
+.moviePoster:hover {
   filter: brightness(60%);
   transform: scale(101%);
 }
 
 /* Footer */
-footer p{
+footer p {
   margin: 0;
 }
 
 /* Miscelaneous */
-.row{
+.row {
   margin-right: 0;
 }
 
-button[type=submit]{
+button[type="submit"] {
   border-radius: 50px;
 }
 
 /* RESPONSIVE */
-@media screen and (max-width:600px){
-  .header{
+@media screen and (max-width: 600px) {
+  .header {
     display: grid;
   }
 
-  .header form{
-    display: block!important;
+  .header form {
+    display: block !important;
+  }
+}
+
+@media screen and (max-width: 380px) {
+  .movieDescription p {
+    font-size: small;
   }
 }

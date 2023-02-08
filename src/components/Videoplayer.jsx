@@ -8,8 +8,10 @@ export default function Videoplayer({
   trailer,
   playing,
   OnclickPlaying,
+  nextMovie,
+  prevMovie,
 }) {
-  const vote_average = Number(movie.vote_average).toFixed(2);
+  const vote_average = movie ? Number(movie.vote_average).toFixed(2) : 0;
 
   return (
     <div>
@@ -58,38 +60,51 @@ export default function Videoplayer({
                 />
               </>
             ) : (
-              <div className="container">
-                <div className="">
-                  {trailer ? (
-                    <button
-                      className="boton"
-                      type="button"
-                      onClick={() => OnclickPlaying(true)}
-                    >
-                      <span className="mdi mdi-play"></span> Trailer
-                    </button>
-                  ) : (
-                    <div className="noTrailerWarning text-warning bg-dark p-1 rounded">
-                      Sorry, no trailer available{" "}
-                      <span className="mdi mdi-emoticon-sad-outline"></span>
+              <>
+                <button type="button" className="my-auto changingButton" onClick={() => prevMovie()}>
+                <span className="mdi mdi-chevron-left-circle"></span>
+                </button>
+                <div className="container">
+                  <div className="">
+                    {trailer ? (
+                      <button
+                        className="boton"
+                        type="button"
+                        onClick={() => OnclickPlaying(true)}
+                      >
+                        <span className="mdi mdi-play"></span> Trailer
+                      </button>
+                    ) : (
+                      <div className="noTrailerWarning text-warning bg-dark p-1 rounded">
+                        Sorry, no trailer available{" "}
+                        <span className="mdi mdi-emoticon-sad-outline"></span>
+                      </div>
+                    )}
+                    <div className="movieDescription">
+                      <div className="">
+                        <h1 className="col col-md-auto text-white">
+                          {movie.title}
+                        </h1>
+                        <h5 className="col text-white m-auto">
+                          <span className="mdi mdi-star"></span> {vote_average}
+                        </h5>
+                      </div>
+                      <p className="text-white">{movie.overview}</p>
                     </div>
-                  )}
-                  <div className="movieDescription">
-                    <div className="">
-                      <h1 className="col col-md-auto text-white">
-                        {movie.title}
-                      </h1>
-                      <h5 className="col text-white m-auto">
-                        <span className="mdi mdi-star"></span> {vote_average}
-                      </h5>
-                    </div>
-                    <p className="text-white">{movie.overview}</p>
                   </div>
                 </div>
-              </div>
+                <button type="button" className="my-auto changingButton" onClick={() => nextMovie()}>
+                <span className="mdi mdi-chevron-right-circle"></span>
+                </button>
+              </>
             )}
           </div>
-        ) : null}
+        ) : (
+          <div className="text-warning text-center mt-3">
+            <h2>We can't find any movie</h2>
+            <span className="mdi mdi-emoticon-sad-outline"></span>
+          </div>
+        )}
       </main>
     </div>
   );

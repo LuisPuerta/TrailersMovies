@@ -5,11 +5,12 @@ export default function Searcher({ searchMovies, searchKey, changeSearchKey }) {
   // const [movieSearched, setMovieSearched] = useState("");
 
   return (
-    <form className="container mb-2 col d-flex " onSubmit={(searchMovies)}>
+    <form className="container mt-1 mb-2 col d-flex " onSubmit={(searchMovies)}>
       <div className="ms-auto">
         <input
           type="text"
           placeholder="Search"
+          id="searcherInput"
           onChange={(e) => changeSearchKey(e.target.value)} 
           //e.target.value is the value that changeSearchKey will send to the change handler function
         />
